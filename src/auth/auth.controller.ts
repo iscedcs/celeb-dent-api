@@ -11,6 +11,7 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
 import { PrismaService } from '../../prisma/prisma.service';
 import {
@@ -35,6 +36,7 @@ export class AuthController {
   ) {}
 
   @Public()
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @Post('login')
   @ApiOperation({ summary: 'Login: returns access and refresh tokens' })
   @ApiResponse({ status: 201, type: TokensResponseDto })
@@ -43,6 +45,7 @@ export class AuthController {
   }
 
   @ApiBearerAuth('JWT-auth')
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @Post('register')
   @ApiOperation({
     summary: 'Create a staff user (Superadmin/Admin action required)',

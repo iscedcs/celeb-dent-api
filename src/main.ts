@@ -12,12 +12,22 @@ import { AllExceptionsFilter } from './common/filters/http-exception.filter';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  // Restrict cross-origin access to explicitly allowed frontend origins
+  const allowedOrigins = (process.env.CORS_ORIGINS ?? '')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+  app.enableCors({
+    origin: allowedOrigins.length > 0 ? allowedOrigins : false,
+    credentials: true,
+  });
+
   //  Add global validation and class-transformer support
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true, // enable class-transformer to use @Exclude/@Expose
       whitelist: true, // remove fields not in DTO
-      forbidNonWhitelisted: false, // throw error if unknown fields are sent
+      forbidNonWhitelisted: true, // throw error if unknown fields are sent
     }),
   );
 

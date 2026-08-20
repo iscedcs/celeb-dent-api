@@ -1,5 +1,6 @@
 import { Global, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { AuthModule } from './auth/auth.module';
 import { PrismaModule } from 'prisma/prisma.module';
 import { MailService } from './utils/mail.service';
@@ -40,6 +41,13 @@ export class MailModule {}
       
     }),
     ScheduleModule.forRoot(),
+    ThrottlerModule.forRoot([
+      {
+        // default cap for all routes; sensitive endpoints override with @Throttle()
+        ttl: 60000,
+        limit: 100,
+      },
+    ]),
     AuthModule,
     PrismaModule,
     MailModule,
@@ -59,6 +67,10 @@ export class MailModule {}
    
   ],
   providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard, // Enforce rate limiting
+    },
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard, // Enforce authentication
