@@ -109,11 +109,11 @@ Please log in and change your password immediately.
       <div style="font-family: 'Segoe UI', Arial, sans-serif; background: #f9f9fc; padding: 32px;">
         <div style="max-width: 480px; margin: auto; background: #fff; border-radius: 12px; box-shadow: 0 2px 8px #e0e0e0; padding: 32px;">
           <div style="text-align: center;">
-            <img src="https://img.icons8.com/color/96/000000/tooth.png" alt="Clinic Logo" style="margin-bottom: 16px;" />
+            <img src="https://img.icons8.com/color/96/000000/hospital-3.png" alt="Hospital Logo" style="margin-bottom: 16px;" />
             <h2 style="color: #2d6cdf; margin-bottom: 8px;">Welcome${name ? `, ${name}` : ''}!</h2>
             
             <p style="font-size: 1.1em; color: #444;">
-              We're excited to have you join <strong>CelebDent Clinic</strong> as a 
+              We're excited to have you join <strong>EMR Hospital System</strong> as a 
               <span style="color: #2d6cdf;">${role}</span>.
             </p>
           </div>
@@ -204,5 +204,5 @@ Please log in and change your password immediately.
     `;
     return this.sendMail(to, subject, text, html);
   }
-
+ 
 }

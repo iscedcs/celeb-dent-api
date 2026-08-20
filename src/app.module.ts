@@ -1,5 +1,6 @@
 import { Global, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { AuthModule } from './auth/auth.module';
 import { PrismaModule } from 'prisma/prisma.module';
 import { MailService } from './utils/mail.service';
@@ -26,10 +27,9 @@ import { AuditTrailModule } from './audit-trail/audit-trail.module';
 
 @Global() // 👈 makes MailService available app-wide
 @Module({
-  providers: [MailService, BillingService],
+  providers: [MailService],
   exports: [MailService],
-  imports: [BillingModule],
-  controllers: [BillingController], // 👈 export so other modules can inject it
+  // No controllers or imports are needed here for a simple global service module
 })
 export class MailModule {}
 
@@ -41,12 +41,20 @@ export class MailModule {}
       
     }),
     ScheduleModule.forRoot(),
+    ThrottlerModule.forRoot([
+      {
+        // default cap for all routes; sensitive endpoints override with @Throttle()
+        ttl: 60000,
+        limit: 100,
+      },
+    ]),
     AuthModule,
     PrismaModule,
     MailModule,
     UsersModule,
     PatientsModule,
     AppointmentsModule,
+    BillingModule, // ✅ Add BillingModule here
     ClinicalNotesModule,
     RemindersModule,
     AttendanceModule,
@@ -59,6 +67,10 @@ export class MailModule {}
    
   ],
   providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard, // Enforce rate limiting
+    },
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard, // Enforce authentication

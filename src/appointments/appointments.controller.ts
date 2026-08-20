@@ -10,6 +10,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import {
   CreateAppointmentDto,
   PublicBookAppointmentDto,
@@ -37,6 +38,7 @@ export class AppointmentsController {
   }
 
   @Public()
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @ApiOperation({ summary: 'Public appointment booking (self-register + appointment)' })
   @Post('public-book')
   async publicBook(@Body() dto: PublicBookAppointmentDto) {
